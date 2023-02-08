@@ -1,4 +1,4 @@
-# FeedEfficiency_SMARTER2023
+# Feed Efficiency Universidad de Leon (SMARTER Training school 2023)
 
 **Author:** Pablo Fonseca and Juan Jose Arranz Santos
 
