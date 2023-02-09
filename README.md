@@ -1,4 +1,4 @@
-# Feed Efficiency in Assaf ewes - Universidad de Leon (SMARTER Training school 2023)
+# Feed Efficiency in Assaf ewes - Universidad de Leon
 
 **Author:** Pablo Fonseca, Gonzalo Hervas, and Juan Jose Arranz 
 
@@ -27,8 +27,6 @@ For this course you will need to have installed in your computer the latest vers
 - **Rstudio:** https://rstudio.com/products/rstudio/download/
 
 In addition to R and RStudio, you will also need to install some packages that will be required for the analysis. The list of packages used in this course can be find below. 
-
-- *BiocManager:* 
 
 ```{r global_options, include = FALSE}
 install.packages("ggplot2")
