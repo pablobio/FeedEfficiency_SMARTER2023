@@ -42,12 +42,6 @@ install.packages("plotly")
 [![Google Scholar Badge](https://img.shields.io/badge/Google-Scholar-lightgrey)](https://scholar.google.com/citations?user=1VUm8EIAAAAJ&hl=pt-BR)
 [![ResearchGate Badge](https://img.shields.io/badge/Research-Gate-9cf)](https://www.researchgate.net/profile/Pablo_Fonseca2)
 
-**Juan Jose Arranz**
-
-[![Gmail Badge](https://img.shields.io/badge/-jjarrs@unileon.es-c14438?style=flat-square&logo=Gmail&logoColor=white&link=mailto:jjarrs@unileon.es )](mailto:jjarrs@unileon.es)
-[![Google Scholar Badge](https://img.shields.io/badge/Google-Scholar-lightgrey)](https://scholar.google.com/citations?user=2IOw3L0AAAAJ)
-[![ResearchGate Badge](https://img.shields.io/badge/Research-Gate-9cf)](https://www.researchgate.net/profile/Juan-Jose-Arranz)
-
 <!-- display the social media buttons in your README -->
 
 [![alt text][1.1]][1]
@@ -74,4 +68,12 @@ install.packages("plotly")
 [1]: http://www.twitter.com/pablo_bio
 [6]: http://www.github.com/pablobio
 
+
+**Juan Jose Arranz**
+
+[![Gmail Badge](https://img.shields.io/badge/-jjarrs@unileon.es-c14438?style=flat-square&logo=Gmail&logoColor=white&link=mailto:jjarrs@unileon.es )](mailto:jjarrs@unileon.es)
+[![Google Scholar Badge](https://img.shields.io/badge/Google-Scholar-lightgrey)](https://scholar.google.com/citations?user=2IOw3L0AAAAJ)
+[![ResearchGate Badge](https://img.shields.io/badge/Research-Gate-9cf)](https://www.researchgate.net/profile/Juan-Jose-Arranz)
+
 <!-- Please don't remove this: Grab your social icons from https://github.com/carlsednaoui/gitsocial -->
+
