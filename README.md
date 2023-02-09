@@ -75,8 +75,8 @@ install.packages("plotly")
 [![Google Scholar Badge](https://img.shields.io/badge/Google-Scholar-lightgrey)](https://scholar.google.com/citations?user=2IOw3L0AAAAJ)
 [![ResearchGate Badge](https://img.shields.io/badge/Research-Gate-9cf)](https://www.researchgate.net/profile/Juan-Jose-Arranz)
 
-[![alt text][1.1]][2]
-[2]: https://twitter.com/juanjoarranz
+[![alt text][1.1]][1]
+[1]: https://twitter.com/juanjoarranz
 
 <!-- Please don't remove this: Grab your social icons from https://github.com/carlsednaoui/gitsocial -->
 
