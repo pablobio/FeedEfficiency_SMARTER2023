@@ -1,0 +1,482 @@
+---
+title: "Estimating Feed Efficiency in Assaf ewes"
+author: "Pablo Fonseca, Gonzalo Hervás, and Juan Jose Arranz"
+date: '2023-02-08'
+output:
+  html_document: default
+  '': default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+
+## Importing database with phenotypic values
+
+The database used here is composed of 39 Assaf ewes in the first lactation which had the estrus synchronized and the lambing performed in a short window in order to avoid variations caused by the lactation stage. These animals were housed in individual pens and were milked twice a day in a 1x10 stall milking parlor (DeLaval). In the first stage, these animals were fed ad libitum a total mixed ratio (TMR) formulated from alfalfa hay (particle size > 4 cm) and concentrates (50:50 forage:concentrate ratio). These ewes had their dry matter intake (DMI) and milk yield measured daily for a period of three weeks after a period of three weeks of adaptation to the TMR. For each animal, the feed intake was estimated daily by weighting the dry matter refused. Additionally, morning and evening milk production was weighted for each animal in order to calculate the daily milk yield. Protein, fat, and lactose content were estimated for each animal as described by Barrio et al. (2022). The changes in the body weight (BW) were calculated by each ewe through the recording of two consecutive days at the beginning and at the end of the FE evaluation. 
+
+
+```{r }
+#Replace the pathway by the folder in your computer
+
+FE.db<-read.table("~/post_doc_Leon/projetos/RFI_sheep_R_calculations/databases_FE/FE_AllMetrics_database_sheep_07_02_23.txt", h=T, sep="\t")
+
+head(FE.db)
+```
+
+The following columns are observed in the database:
+
+*Animal_ID:* Animal identification
+
+*meanBW:* Average body weight (kg)
+
+*BWC1:* Body weight change during the experimental period
+
+*days_period:* Days in the experiment
+
+*Fat:* Fat yeild (g/kg)
+
+*Protein:* Protein yield (g/kg)
+
+*Milk:* Milk yield (kg/d)
+
+*intake:* Actual dry matter intake
+
+*energyTMR:* Energy content of the total mixed ratio (TMR)
+
+*DIM:* Days in milk
+
+
+## Importing required libraries
+
+```{r }
+library(ggplot2)
+library(PerformanceAnalytics)
+```
+
+```{r, include=FALSE}
+#Defining custom theme for ploting
+custom_theme<-function(){
+  theme(panel.grid.major = element_line(colour = "#d3d3d3"),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        plot.title = element_text(size = 14, face = "bold"),
+        axis.title = element_text(face="bold", size=20),
+        axis.text.x = element_text(colour="black", size = 20, angle = 0),
+        axis.text.y = element_text(colour="black", size = 20),
+        axis.line = element_line(size=0.5, colour = "black"),
+        legend.title = element_text(size = 25),
+        legend.text = element_text(size=20),
+        strip.text.x = element_text(size = 15))
+        }
+```
+
+## Estimating additional metrics for FEI, FCR and RFI calculations
+
+In order to calculate the FE metrics, some additional values must be estimated.
+
+*Body weight change during the period (BWC2)*
+
+```{r }
+#Defined as the body weight change during the whole period divided by the days 
+#in the period
+
+FE.db$BWC2<-FE.db$BWC1/FE.db$days_period
+```
+
+*Metabolic body weight*
+
+```{r }
+#Defined as the body weight raised to 0.75
+
+FE.db$MBW<-FE.db$meanBW^0.75
+```
+
+*Energy requirements for BW change, UFL/d*
+
+```{r }
+#Defined based on INRA equations
+
+FE.db$ER_BWC<-(0.28*(FE.db$BWC2*1000))/100
+```
+
+*Energy requirements for maintenance, UFL/d*
+
+```{r }
+#Defined based on INRA equations
+
+FE.db$ER_main<-(0.0345*FE.db$MBW)
+```
+
+
+*Mean milk yield, L/d (MY)*
+
+```{r }
+FE.db$MY<-FE.db$Milk*1.036
+```
+
+*Fat yield, L/d (MY)*
+
+```{r }
+FE.db$FY<-FE.db$Fat*1.036
+```
+
+*Protein yield, L/d (MY)*
+
+```{r }
+FE.db$PY<-FE.db$Protein*1.036
+```
+
+*Metabolic body weight change per day*
+
+```{r }
+#Defined as the absolute BWC1 raised to 0.75
+
+FE.db$MBWC1<-abs(FE.db$BWC1)^0.75
+```
+
+
+*Metabolic body weight change for the experimental period*
+
+```{r }
+#Defined as the absolute BWC2 raised to 0.75
+
+FE.db$MBWC2<-abs(FE.db$BWC2)^0.75
+```
+
+
+*Energy corrected milk (ECM, kg/d) - INRA 2018*
+
+```{r }
+#Defined based on INRA equations
+
+FE.db$ECM<-FE.db$MY*(0.0071*FE.db$FY+0.0043*FE.db$PY+0.2224)
+```
+
+*Energy requirements for milk yield, UFL/d*
+
+```{r }
+#Defined based on INRA equations
+
+FE.db$ER_MY<-0.686*FE.db$ECM
+```
+
+*Total energy requirements, UFL/d*
+
+```{r }
+#Defined as the sum of the Energy requirements for MY, maintenance, and BWC
+
+FE.db$TER<-rowSums(FE.db[,c("ER_MY","ER_main","ER_BWC")])
+```
+
+*Predicted DM intake*
+
+```{r }
+#Defined as the ratio between total energy requirements and the energy on TMR
+
+FE.db$Pred_DMI<-FE.db$TER/FE.db$energyTMR
+```
+
+
+**Checking new database**
+
+```{r }
+head(FE.db)
+```
+
+
+## Estimating FEI and FCR
+
+After the estimation of the additional metrics above mentioned, the estimation of FCR and FEI it is a straightforward approach.
+
+### *Feed efficiency index (FEI)*
+
+```{r }
+#FEI is defined as Actual dry matter intake subtracted by the predicted dry matter intake
+
+FE.db$FEI<-FE.db$intake-FE.db$Pred_DMI
+```
+
+```{r FEI_distribution,}
+#Checking distribution of FEI values
+
+ggplot(FE.db, aes(x=FEI)) + 
+  geom_histogram(color="black", fill="white") + 
+  custom_theme() 
+
+#Checking correlation between FEI and actual intake values
+
+cor_FEI_DMI<-round(cor(FE.db$intake, FE.db$FEI),2)
+
+ggplot(FE.db, aes(y=intake,x=FEI)) + 
+  geom_point() + 
+  custom_theme() + scale_y_continuous(name="DMI") +
+  ggtitle(paste("Actual DMI vs FEI (r2= ", cor_FEI_DMI,")",sep=""))
+
+```
+
+
+### *Feed Conversion Ratio (FCR)*
+
+```{r }
+#FCR is defined as Feed intake (kg DM/d) / ECM (kg/d), where ECM is estimated based on the ECM equation from INRA 2018 (for sheep) 
+
+FE.db$FCR<-FE.db$intake/FE.db$ECM
+```
+
+```{r FCR_distribution,}
+#Checking distribution of FCR values
+
+ggplot(FE.db, aes(x=FCR)) + 
+  geom_histogram(color="black", fill="white") + 
+  custom_theme() 
+
+#Checking correlation between FCR and actual intake values
+
+cor_FCR_DMI<-round(cor(FE.db$intake, FE.db$FCR),2)
+
+ggplot(FE.db, aes(y=intake,x=FCR)) + 
+  geom_point() + 
+  custom_theme() + scale_y_continuous(name="DMI") +
+  ggtitle(paste("Actual DMI vs FCR (r2= ", cor_FCR_DMI,")",sep=""))
+
+```
+
+
+## Estimating Residual feed intake (RFI)
+
+The RFI is defined as the subtraction of the actual feed intake by the predicted feed intake. The prediction of feed intake can be performed using different models. Here, for models to predict the feed intake and subsequently the RFI will be shown.
+
+*RFI estimation based on the model proposed by Pryce et al. 2015*
+
+````{r}
+#A linear model including ECM, MBW, BWC1 and DIM is used to predict the feed intake
+
+model.pryce<-lm(intake ~ ECM + MBW + BWC1 + DIM,data=FE.db)
+
+#Checking model output
+
+summary(model.pryce)
+
+#Extracting residuals (RFI)
+FE.db$RFI_pryce<-residuals(model.pryce)
+
+head(FE.db$RFI_pryce)
+
+#Checking distribution of RFI_pryce values
+
+ggplot(FE.db, aes(x=RFI_pryce)) + 
+  geom_histogram(color="black", fill="white") + 
+  custom_theme() 
+
+#Checking the correlation between predicted and actual values
+
+r2_pryce<-round(summary(model.pryce)$adj.r.squared,3)
+
+RFI_pryce_table<-data.frame(DMI=FE.db$intake, predicted_DMI=predict(model.pryce))
+
+ggplot(RFI_pryce_table, aes(y=DMI,x=predicted_DMI)) + 
+  geom_point() + 
+  custom_theme() + 
+  ggtitle(paste("Actual DMI vs predicted DMI by Pryce et al. 2015 (r2= ", r2_pryce,")",sep=""))
+
+
+````
+
+
+*RFI estimation based on ECM, MBW and MBWC2*
+
+````{r}
+#A linear model including ECM, MBW and MBWC2 is used to predict the feed intake
+
+model.RFI2<-lm(intake ~ ECM + MBW + MBWC2,data=FE.db)
+
+#Checking model output
+
+summary(model.RFI2)
+
+#Extracting residuals (RFI)
+FE.db$RFI2<-residuals(model.RFI2)
+
+head(FE.db$RFI2)
+
+#Checking distribution of RFI_pryce values
+
+ggplot(FE.db, aes(x=RFI2)) + 
+  geom_histogram(color="black", fill="white") + 
+  custom_theme()
+
+#Checking the correlation between predicted and actual values
+
+r2_RFI2<-round(summary(model.RFI2)$adj.r.squared,3)
+
+RFI_RFI2_table<-data.frame(DMI=FE.db$intake, predicted_DMI=predict(model.RFI2))
+
+ggplot(RFI_RFI2_table, aes(y=DMI,x=predicted_DMI)) + 
+  geom_point() + 
+  custom_theme() + 
+  ggtitle(paste("Actual DMI vs predicted DMI by RFI2 (r2= ", r2_RFI2,")",sep=""))
+
+````
+
+
+
+*RFI estimation based on ECM, MBW and an interaction between MeanBW and BWC2*
+
+````{r}
+#A linear model including ECM, MBW and an interaction term between meanBW and BWC2 is used to predict the feed intake
+
+model.RFI3<-lm(intake ~ ECM + MBW + meanBW*BWC2,data=FE.db)
+
+#Checking model output
+
+summary(model.RFI3)
+
+#Extracting residuals (RFI)
+FE.db$RFI3<-residuals(model.RFI3)
+
+head(FE.db$RFI3)
+
+#Checking distribution of RFI_pryce values
+
+ggplot(FE.db, aes(x=RFI3)) + 
+  geom_histogram(color="black", fill="white") + 
+  custom_theme()
+
+#Checking the correlation between predicted and actual values
+
+r2_RFI3<-round(summary(model.RFI3)$adj.r.squared,3)
+
+RFI_RFI3_table<-data.frame(DMI=FE.db$intake, predicted_DMI=predict(model.RFI3))
+
+ggplot(RFI_RFI3_table, aes(y=DMI,x=predicted_DMI)) + 
+  geom_point() + 
+  custom_theme() + 
+  ggtitle(paste("Actual DMI vs predicted DMI by RFI3 (r2= ", r2_RFI3,")",sep=""))
+
+
+````
+
+## Estimating correlation between FE metrics
+
+The Pearson correlation across the FE variables estimated here will be calculated and plotted using the R package PerformanceAnalytics. It is possible to note that, in general, a strong correlation is observed between the variables. 
+
+````{r}
+chart.Correlation(FE.db[,c("FEI","FCR", "RFI_pryce", "RFI2", "RFI3")], histogram=TRUE, pch=19)
+````
+
+## Additional comment
+
+If we check the summary of the models used here to estimate RFI, we will notice that the intercept is not significant for any model. Consequently, what would happen if we eclude the intercept from our models?
+
+*RFI estimation based on the model proposed by Pryce et al. 2015*
+
+````{r}
+#A linear model including ECM, MBW, BWC1 and DIM is used to predict the feed intake
+
+model.pryce<-lm(intake ~ 0 + ECM + MBW + BWC1 + DIM,data=FE.db)
+
+#Checking model output
+
+summary(model.pryce)
+
+#Extracting residuals (RFI)
+FE.db$RFI_pryce_NoInt<-residuals(model.pryce)
+
+head(FE.db$RFI_pryce_NoInt)
+
+#Checking distribution of RFI_pryce_NoInt values
+
+ggplot(FE.db, aes(x=RFI_pryce_NoInt)) + 
+  geom_histogram(color="black", fill="white") + 
+  custom_theme() 
+
+#Checking the correlation between predicted and actual values
+
+r2_pryce<-round(summary(model.pryce)$adj.r.squared,3)
+
+RFI_pryce_NoInt_table<-data.frame(DMI=FE.db$intake, predicted_DMI=predict(model.pryce))
+
+ggplot(RFI_pryce_NoInt_table, aes(y=DMI,x=predicted_DMI)) + 
+  geom_point() + 
+  custom_theme() + 
+  ggtitle(paste("Actual DMI vs predicted DMI by Pryce et al. 2015 (r2= ", r2_pryce,")",sep=""))
+
+
+````
+
+
+*RFI estimation based on ECM, MBW and MBWC2*
+
+````{r}
+#A linear model including ECM, MBW and MBWC2 is used to predict the feed intake
+
+model.RFI2_NoInt<-lm(intake ~ 0 + ECM + MBW + MBWC2,data=FE.db)
+
+#Checking model output
+
+summary(model.RFI2_NoInt)
+
+#Extracting residuals (RFI)
+FE.db$RFI2_NoInt<-residuals(model.RFI2_NoInt)
+
+head(FE.db$RFI2_NoInt)
+
+#Checking distribution of RFI_pryce values
+
+ggplot(FE.db, aes(x=RFI2_NoInt)) + 
+  geom_histogram(color="black", fill="white") + 
+  custom_theme()
+
+#Checking the correlation between predicted and actual values
+
+r2_RFI2_NoInt<-round(summary(model.RFI2_NoInt)$adj.r.squared,3)
+
+RFI_RFI2_NoInt_table<-data.frame(DMI=FE.db$intake, predicted_DMI=predict(model.RFI2_NoInt))
+
+ggplot(RFI_RFI2_NoInt_table, aes(y=DMI,x=predicted_DMI)) + 
+  geom_point() + 
+  custom_theme() + 
+  ggtitle(paste("Actual DMI vs predicted DMI by RFI2_NoInt (r2= ", r2_RFI2_NoInt,")",sep=""))
+
+````
+
+
+
+*RFI estimation based on ECM, MBW and an interaction between MeanBW and BWC2*
+
+````{r}
+#A linear model including ECM, MBW and an interaction term between meanBW and BWC2 is used to predict the feed intake
+
+model.RFI3_NoInt<-lm(intake ~ 0 + ECM + MBW + meanBW*BWC2,data=FE.db)
+
+#Checking model output
+
+summary(model.RFI3_NoInt)
+
+#Extracting residuals (RFI)
+FE.db$RFI3_NoInt<-residuals(model.RFI3_NoInt)
+
+head(FE.db$RFI3_NoInt)
+
+#Checking distribution of RFI_pryce values
+
+ggplot(FE.db, aes(x=RFI3_NoInt)) + 
+  geom_histogram(color="black", fill="white") + 
+  custom_theme()
+
+#Checking the correlation between predicted and actual values
+
+r2_RFI3_NoInt<-round(summary(model.RFI3_NoInt)$adj.r.squared,3)
+
+RFI_RFI3_NoInt_table<-data.frame(DMI=FE.db$intake, predicted_DMI=predict(model.RFI3_NoInt))
+
+ggplot(RFI_RFI3_NoInt_table, aes(y=DMI,x=predicted_DMI)) + 
+  geom_point() + 
+  custom_theme() + 
+  ggtitle(paste("Actual DMI vs predicted DMI by RFI3_NoInt (r2= ", r2_RFI3_NoInt,")",sep=""))
+
+
+````
