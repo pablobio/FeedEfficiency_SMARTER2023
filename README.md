@@ -1,8 +1,8 @@
-# Feed Efficiency Universidad de Leon (SMARTER Training school 2023)
+# Feed Efficiency in Assaf ewes - Universidad de Leon (SMARTER Training school 2023)
 
-**Author:** Pablo Fonseca and Juan Jose Arranz Santos
+**Author:** Pablo Fonseca, Gonzalo Hervas, and Juan Jose Arranz 
 
-**Date:** 05/02/21
+**Date:** 09/02/23
 
 ## Table of contents
 * [General info](#general-info)
@@ -11,20 +11,18 @@
 
 ## General info
 
+This repository contains the material necessary for the anañysis of feed efficiency in Assaf ewes that will be presented at the SMARTER Training School: "Using Genetics and Modelling to Improve Resilience and Efficiency in Small Ruminants". 
 
-This data respository is composed by the following folders:
+*Tutorial:* https://pablobio.github.io/FeedEfficiency_SMARTER2023/
 
-- **data:** The data folder contains all the required datasets used for the analysis performed during this course.
+*Database:* Folder containing the databse required for FE estimations
 
-- **presentations:** In this folder, you can find the presentations used for theoretical discussion during the course.
-
-- **scripts:** The scripts with code used for the analysis performed in this course are saved in this folder.
 
 ## Softwares and packages
 
 For this course you will need to have installed in your computer the latest versions of R and RStudio. This softwares can be downloaded in the following links:
 
-- **R:** 
+- **R:** https://cran.irsn.fr/
 
 - **Rstudio:** https://rstudio.com/products/rstudio/download/
 
@@ -33,7 +31,9 @@ In addition to R and RStudio, you will also need to install some packages that w
 - *BiocManager:* 
 
 ```{r global_options, include = FALSE}
-install.packages("BiocManager")
+install.packages("ggplot2")
+install.packages("PerformanceAnalytics")
+install.packages("plotly")
 ```
 
 ## Contact
@@ -42,6 +42,10 @@ install.packages("BiocManager")
 [![Outlook Badge](https://img.shields.io/badge/-pfonseca@uoguelph.ca-0078d4?style=flat-square&logo=microsoft-outlook&logoColor=white&link=mailto:pfonseca@uoguelph.ca)](mailto:pfonseca@uoguelph.ca)
 [![Google Scholar Badge](https://img.shields.io/badge/Google-Scholar-lightgrey)](https://scholar.google.com/citations?user=1VUm8EIAAAAJ&hl=pt-BR)
 [![ResearchGate Badge](https://img.shields.io/badge/Research-Gate-9cf)](https://www.researchgate.net/profile/Pablo_Fonseca2)
+
+[![Gmail Badge](https://img.shields.io/badge/-jjarrs@unileon.es-c14438?style=flat-square&logo=Gmail&logoColor=white&link=mailto:jjarrs@unileon.es )](mailto:jjarrs@unileon.es)
+[![Google Scholar Badge](https://img.shields.io/badge/Google-Scholar-lightgrey)](https://scholar.google.com/citations?user=2IOw3L0AAAAJ)
+[![ResearchGate Badge](https://img.shields.io/badge/Research-Gate-9cf)](https://www.researchgate.net/profile/Juan-Jose-Arranz)
 
 <!-- display the social media buttons in your README -->
 
