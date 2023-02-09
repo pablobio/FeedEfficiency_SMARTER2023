@@ -53,6 +53,7 @@ The following columns are observed in the database:
 ```{r }
 library(ggplot2)
 library(PerformanceAnalytics)
+library(plotly)
 ```
 
 ```{r, include=FALSE}
@@ -210,10 +211,16 @@ ggplot(FE.db, aes(x=FEI)) +
 
 cor_FEI_DMI<-round(cor(FE.db$intake, FE.db$FEI),2)
 
-ggplot(FE.db, aes(y=intake,x=FEI)) + 
+text_FEI<-paste("Animal ID: ", FE.db$Animal_ID, "\n","DMI: ", 
+                round(FE.db$intake,2), "\n" ,
+                "FEI: ", round(FE.db$FEI,2),sep="")
+
+FEI_plot<-ggplot(FE.db, aes(y=intake,x=FEI, text=text_FEI)) + 
   geom_point() + 
   custom_theme() + scale_y_continuous(name="DMI") +
   ggtitle(paste("Actual DMI vs FEI (r2= ", cor_FEI_DMI,")",sep=""))
+
+ggplotly(FEI_plot, tooltip = "text")
 
 ```
 
@@ -237,10 +244,16 @@ ggplot(FE.db, aes(x=FCR)) +
 
 cor_FCR_DMI<-round(cor(FE.db$intake, FE.db$FCR),2)
 
-ggplot(FE.db, aes(y=intake,x=FCR)) + 
+text_FCR<-paste("Animal ID: ", FE.db$Animal_ID, "\n","DMI: ", 
+                round(FE.db$intake,2), "\n" ,
+                "FCR: ", round(FE.db$FCR,2),sep="")
+
+FCR_plot<-ggplot(FE.db, aes(y=intake,x=FCR, text=text_FCR)) + 
   geom_point() + 
   custom_theme() + scale_y_continuous(name="DMI") +
   ggtitle(paste("Actual DMI vs FCR (r2= ", cor_FCR_DMI,")",sep=""))
+
+ggplotly(FCR_plot, tooltip = "text")
 
 ```
 
@@ -277,10 +290,16 @@ r2_pryce<-round(summary(model.pryce)$adj.r.squared,3)
 
 RFI_pryce_table<-data.frame(DMI=FE.db$intake, predicted_DMI=predict(model.pryce))
 
-ggplot(RFI_pryce_table, aes(y=DMI,x=predicted_DMI)) + 
+text_pryce<-paste("Animal ID: ", FE.db$Animal_ID, "\n","DMI: ", 
+                round(RFI_pryce_table$DMI,2), "\n" ,
+                "RFI_pryce: ", round(RFI_pryce_table$predicted_DMI,2),sep="")
+
+plot_pryce<-ggplot(RFI_pryce_table, aes(y=DMI,x=predicted_DMI, text=text_pryce)) + 
   geom_point() + 
   custom_theme() + 
-  ggtitle(paste("Actual DMI vs predicted DMI by Pryce et al. 2015 (r2= ", r2_pryce,")",sep=""))
+  ggtitle(paste("Actual DMI vs predicted DMI by pryce (r2= ", r2_pryce,")",sep=""))
+
+ggplotly(plot_pryce, tooltip = "text")
 
 
 ````
@@ -314,10 +333,16 @@ r2_RFI2<-round(summary(model.RFI2)$adj.r.squared,3)
 
 RFI_RFI2_table<-data.frame(DMI=FE.db$intake, predicted_DMI=predict(model.RFI2))
 
-ggplot(RFI_RFI2_table, aes(y=DMI,x=predicted_DMI)) + 
+text_RFI2<-paste("Animal ID: ", FE.db$Animal_ID, "\n","DMI: ", 
+                round(RFI_RFI2_table$DMI,2), "\n" ,
+                "RFI2: ", round(RFI_RFI2_table$predicted_DMI,2),sep="")
+
+plot_RFI2<-ggplot(RFI_RFI2_table, aes(y=DMI,x=predicted_DMI, text=text_RFI2)) + 
   geom_point() + 
   custom_theme() + 
   ggtitle(paste("Actual DMI vs predicted DMI by RFI2 (r2= ", r2_RFI2,")",sep=""))
+
+ggplotly(plot_RFI2, tooltip = "text")
 
 ````
 
@@ -351,11 +376,16 @@ r2_RFI3<-round(summary(model.RFI3)$adj.r.squared,3)
 
 RFI_RFI3_table<-data.frame(DMI=FE.db$intake, predicted_DMI=predict(model.RFI3))
 
-ggplot(RFI_RFI3_table, aes(y=DMI,x=predicted_DMI)) + 
+text_RFI3<-paste("Animal ID: ", FE.db$Animal_ID, "\n","DMI: ", 
+                round(RFI_RFI3_table$DMI,2), "\n" ,
+                "RFI3: ", round(RFI_RFI3_table$predicted_DMI,2),sep="")
+
+plot_RFI3<-ggplot(RFI_RFI3_table, aes(y=DMI,x=predicted_DMI, text=text_RFI3)) + 
   geom_point() + 
   custom_theme() + 
-  ggtitle(paste("Actual DMI vs predicted DMI by RFI3 (r2= ", r2_RFI3,")",sep=""))
+  ggtitle(paste("Actual DMI vs predicted DMI by pryce (r2= ", r2_RFI3,")",sep=""))
 
+ggplotly(plot_RFI3, tooltip = "text")
 
 ````
 
@@ -395,14 +425,21 @@ ggplot(FE.db, aes(x=RFI_pryce_NoInt)) +
 
 #Checking the correlation between predicted and actual values
 
-r2_pryce<-round(summary(model.pryce)$adj.r.squared,3)
+r2_pryce_NoInt<-round(summary(model.pryce)$adj.r.squared,3)
 
 RFI_pryce_NoInt_table<-data.frame(DMI=FE.db$intake, predicted_DMI=predict(model.pryce))
 
-ggplot(RFI_pryce_NoInt_table, aes(y=DMI,x=predicted_DMI)) + 
+text_pryce_NoInt<-paste("Animal ID: ", FE.db$Animal_ID, "\n","DMI: ", 
+                round(RFI_pryce_NoInt_table$DMI,2), "\n" ,
+                "RFI_pryce_NoInt: ", 
+                round(RFI_pryce_NoInt_table$predicted_DMI,2),sep="")
+
+plot_pryce_NoInt<-ggplot(RFI_pryce_NoInt_table, aes(y=DMI,x=predicted_DMI, text=text_pryce_NoInt)) + 
   geom_point() + 
   custom_theme() + 
-  ggtitle(paste("Actual DMI vs predicted DMI by Pryce et al. 2015 (r2= ", r2_pryce,")",sep=""))
+  ggtitle(paste("Actual DMI vs predicted DMI by pryce (r2= ", r2_pryce_NoInt,")",sep=""))
+
+ggplotly(plot_pryce_NoInt, tooltip = "text")
 
 
 ````
@@ -436,10 +473,17 @@ r2_RFI2_NoInt<-round(summary(model.RFI2_NoInt)$adj.r.squared,3)
 
 RFI_RFI2_NoInt_table<-data.frame(DMI=FE.db$intake, predicted_DMI=predict(model.RFI2_NoInt))
 
-ggplot(RFI_RFI2_NoInt_table, aes(y=DMI,x=predicted_DMI)) + 
+text_RFI2_NoInt<-paste("Animal ID: ", FE.db$Animal_ID, "\n","DMI: ", 
+                round(RFI_RFI2_NoInt_table$DMI,2), "\n" ,
+                "RFI2_NoInt: ", 
+                round(RFI_RFI2_NoInt_table$predicted_DMI,2),sep="")
+
+plot_RFI2_NoInt<-ggplot(RFI_RFI2_NoInt_table, aes(y=DMI,x=predicted_DMI, text=text_RFI2_NoInt)) + 
   geom_point() + 
   custom_theme() + 
-  ggtitle(paste("Actual DMI vs predicted DMI by RFI2_NoInt (r2= ", r2_RFI2_NoInt,")",sep=""))
+  ggtitle(paste("Actual DMI vs predicted DMI by RFI2 (r2= ", r2_RFI2_NoInt,")",sep=""))
+
+ggplotly(plot_RFI2_NoInt, tooltip = "text")
 
 ````
 
@@ -473,10 +517,17 @@ r2_RFI3_NoInt<-round(summary(model.RFI3_NoInt)$adj.r.squared,3)
 
 RFI_RFI3_NoInt_table<-data.frame(DMI=FE.db$intake, predicted_DMI=predict(model.RFI3_NoInt))
 
-ggplot(RFI_RFI3_NoInt_table, aes(y=DMI,x=predicted_DMI)) + 
+text_RFI3_NoInt<-paste("Animal ID: ", FE.db$Animal_ID, "\n","DMI: ", 
+                round(RFI_RFI3_NoInt_table$DMI,2), "\n" ,
+                "RFI3_NoInt: ", 
+                round(RFI_RFI3_NoInt_table$predicted_DMI,2),sep="")
+
+plot_RFI3_NoInt<-ggplot(RFI_RFI3_NoInt_table, aes(y=DMI,x=predicted_DMI, text=text_RFI3_NoInt)) + 
   geom_point() + 
   custom_theme() + 
-  ggtitle(paste("Actual DMI vs predicted DMI by RFI3_NoInt (r2= ", r2_RFI3_NoInt,")",sep=""))
+  ggtitle(paste("Actual DMI vs predicted DMI by RFI3 (r2= ", r2_RFI3_NoInt,")",sep=""))
+
+ggplotly(plot_RFI3_NoInt, tooltip = "text")
 
 
 ````
