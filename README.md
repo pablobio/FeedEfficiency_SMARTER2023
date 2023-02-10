@@ -44,7 +44,7 @@ install.packages("plotly")
 
 <!-- display the social media buttons in your README -->
 
-[![alt text][1.1]][1]
+
 [![alt text][6.1]][6]
 
 
@@ -58,7 +58,6 @@ install.packages("plotly")
 
 <!-- icons without padding -->
 
-[1.2]: http://i.imgur.com/wWzX9uB.png (twitter icon without padding)
 [6.2]: http://i.imgur.com/9I6NRUm.png (github icon without padding)
 
 
@@ -77,5 +76,6 @@ install.packages("plotly")
 <!-- Please don't remove this: Grab your social icons from https://github.com/carlsednaoui/gitsocial -->
 
 **Grupo MEjoraGeneticaAnimal-ULE (MEGA_ULE)**
-
+[![alt text][1.1]][1]
+[1.2]: http://i.imgur.com/wWzX9uB.png (twitter icon without padding)
 [1]: https://twitter.com/MEGA_ULE
