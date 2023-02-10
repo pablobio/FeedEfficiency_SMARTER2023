@@ -53,7 +53,6 @@ install.packages("plotly")
 
 <!-- icons with padding -->
 
-[1.1]: http://i.imgur.com/tXSoThF.png (twitter icon with padding)
 [6.1]: http://i.imgur.com/0o48UoR.png (github icon with padding)
 
 <!-- icons without padding -->
@@ -77,5 +76,9 @@ install.packages("plotly")
 
 **Grupo MEjoraGeneticaAnimal-ULE (MEGA_ULE)**
 [![alt text][1.1]][1]
+
+[1.1]: http://i.imgur.com/tXSoThF.png (twitter icon with padding)
+
 [1.2]: http://i.imgur.com/wWzX9uB.png (twitter icon without padding)
+
 [1]: https://twitter.com/MEGA_ULE
