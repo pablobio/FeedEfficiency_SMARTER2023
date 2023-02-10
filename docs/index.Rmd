@@ -11,6 +11,11 @@ output:
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```
 
+```{r setup_tables, echo=FALSE, results='asis'}
+library(knitr)
+library(tidyr)
+library(kableExtra)
+```
 
 ## Importing database with phenotypic values
 
@@ -54,6 +59,7 @@ The following columns are observed in the database:
 library(ggplot2)
 library(PerformanceAnalytics)
 library(plotly)
+library(patchwork)
 ```
 
 ```{r, include=FALSE}
@@ -399,21 +405,21 @@ chart.Correlation(FE.db[,c("FEI","FCR", "RFI_pryce", "RFI2", "RFI3")], histogram
 
 ## Additional comment
 
-If we check the summary of the models used here to estimate RFI, we will notice that the intercept is not significant for any model. Consequently, what would happen if we eclude the intercept from our models?
+If we check the summary of the models used here to estimate RFI, we will notice that the intercept is not significant for any model. Consequently, what would happen if we exclude the intercept from our models? But, even more important... Should we remove the intercept from our model in this case?
 
 *RFI estimation based on the model proposed by Pryce et al. 2015*
 
 ````{r}
 #A linear model including ECM, MBW, BWC1 and DIM is used to predict the feed intake
 
-model.pryce<-lm(intake ~ 0 + ECM + MBW + BWC1 + DIM,data=FE.db)
+model.pryce_NoInt<-lm(intake ~ 0 + ECM + MBW + BWC1 + DIM,data=FE.db)
 
 #Checking model output
 
-summary(model.pryce)
+summary(model.pryce_NoInt)
 
 #Extracting residuals (RFI)
-FE.db$RFI_pryce_NoInt<-residuals(model.pryce)
+FE.db$RFI_pryce_NoInt<-residuals(model.pryce_NoInt)
 
 head(FE.db$RFI_pryce_NoInt)
 
@@ -531,3 +537,57 @@ ggplotly(plot_RFI3_NoInt, tooltip = "text")
 
 
 ````
+
+
+It is posisble to note that much higher adjusted R-squares were obtained for all the models. However, should we trust on those values?
+
+
+**Problems when you remove the intercept**
+
+Let's use the models with higher R-adjusted with intercept and its version without intercept as example. First, we should check the distribution of the residuals obtained in both models.
+
+
+````{r}
+# Checking the mean and standard deviation of the residuals obtained in each model
+
+table.res<-data.frame(res_pryce=residuals(model.pryce), res_pryce_NoInt=residuals(model.pryce_NoInt))
+
+head(table.res)
+````
+
+```{r setup_RFI_table, echo=FALSE}
+res.out<-data.frame(Mean=round(c(mean(table.res$res_pryce), mean(table.res$res_pryce_NoInt)),4), SD=round(c(sd(table.res$res_pryce), sd(table.res$res_pryce_NoInt)),4))
+
+rownames(res.out)<-c("RFI Pryce", "RFI Pryce without intercept")
+
+kable(res.out, caption="Mean and standard deviation of the residuals obtained in the models based on Pryce et al. (2015) with and without intercept.") %>%
+  kable_styling(full_width = F)
+
+```
+
+```{r, fig.dim = c(10, 6)}
+
+res.pryce<-ggplot(model.pryce, aes(y=.resid,x=.fitted)) + 
+  geom_point() + 
+  custom_theme() + 
+  ggtitle("RFI Pryce et al. (2015)") + 
+  custom_theme() + scale_y_continuous(name="Residuals") +
+  scale_x_continuous(name="Fitted values") 
+
+res.pryce.NoInt<-ggplot(model.pryce_NoInt, aes(y=.resid,x=.fitted)) + 
+  geom_point() + 
+  custom_theme() + 
+  ggtitle("RFI Pryce et al. (2015) without intercept") + 
+  custom_theme() + scale_y_continuous(name="Residuals") +
+  scale_x_continuous(name="Fitted values") 
+  
+res.pryce | res.pryce.NoInt
+
+```
+
+**Conclusion about intercept removal**
+
+As we can note, the SD obtained for the residuals in both models are quite similar. However, the mean of the residuals in the model without intercept is not equal zero, which is a requirement for the kind of model used here. Additionally, when we remove the intercept, we force the program to set the this value to be equal zero. Consequently, assuming that our the intercepts of our regression lines pass through the zero, which is not the case of most of the models fitted with real data (in the case of a continuous variable). In summary, to run a model without intercept, in the current case, result in an inflation of the sums of squares (SS) for the model (SSmodel) and residuals (SSresidual), leading to the increase in the R-square values.
+
+
+
