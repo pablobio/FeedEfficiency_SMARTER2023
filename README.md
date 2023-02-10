@@ -65,7 +65,6 @@ install.packages("plotly")
 <!-- links to your social media accounts -->
 <!-- update these accordingly -->
 
-[1]: http://www.twitter.com/pablo_bio
 [6]: http://www.github.com/pablobio
 
 
@@ -77,3 +76,6 @@ install.packages("plotly")
 
 <!-- Please don't remove this: Grab your social icons from https://github.com/carlsednaoui/gitsocial -->
 
+**Grupo MEjoraGeneticaAnimal-ULE (MEGA_ULE)**
+
+[1]: https://twitter.com/MEGA_ULE
