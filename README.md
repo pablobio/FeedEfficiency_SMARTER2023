@@ -32,6 +32,7 @@ In addition to R and RStudio, you will also need to install some packages that w
 install.packages("ggplot2")
 install.packages("PerformanceAnalytics")
 install.packages("plotly")
+install.packages("patchwork")
 ```
 
 ## Contact
