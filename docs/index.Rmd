@@ -121,19 +121,19 @@ FE.db$ER_main<-(0.0345*FE.db$MBW)
 *Mean milk yield, L/d (MY)*
 
 ```{r }
-FE.db$MY<-FE.db$Milk*1.036
+FE.db$MY<-FE.db$Milk/1.036
 ```
 
 *Fat yield, L/d (MY)*
 
 ```{r }
-FE.db$FY<-FE.db$Fat*1.036
+FE.db$FY<-FE.db$Fat/1.036
 ```
 
 *Protein yield, L/d (MY)*
 
 ```{r }
-FE.db$PY<-FE.db$Protein*1.036
+FE.db$PY<-FE.db$Protein/1.036
 ```
 
 *Metabolic body weight change per day*
@@ -402,6 +402,27 @@ The Pearson correlation across the FE variables estimated here will be calculate
 ````{r}
 chart.Correlation(FE.db[,c("FEI","FCR", "RFI_pryce", "RFI2", "RFI3")], histogram=TRUE, pch=19)
 ````
+
+## Creating a final database with FE metrics
+
+Let's create a final databse containing only the Animal Id and the FE metrics estimated in the last steps.
+
+````{r}
+#Filtering the database created in this tutorial based on the column names
+FE.metrics<-FE.db[,c("Animal_ID","FEI","FCR", "RFI_pryce", "RFI2", "RFI3")]
+
+head(FE.metrics)
+
+````
+
+This database could be save in your computer using the following code: 
+
+````{r, eval = FALSE}
+#Filtering the database created in this tutorial based on the column names
+write.table(FE.metrics, file="Feed_EfficiencyMetrics_smarter.txt", col.names=T, row.names=F, sep="\t", quote=F)
+````
+
+This will create the tab-delimited file "Feed_EfficiencyMetrics_smarter.txt" in your work directory.
 
 ## Additional comment
 
