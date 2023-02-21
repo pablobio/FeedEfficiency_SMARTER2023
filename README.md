@@ -18,7 +18,7 @@ This repository contains the material necessary for the anañysis of feed effici
 *Database:* Folder containing the databse required for FE estimations
 
 
-## Softwares and packages
+## Software and packages
 
 For this course you will need to have installed in your computer the latest versions of R and RStudio. This softwares can be downloaded in the following links:
 
