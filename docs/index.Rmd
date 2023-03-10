@@ -34,6 +34,8 @@ The following columns are observed in the database:
 
 *Animal_ID:* Animal identification
 
+*Treatment:* Categorical variable indicating if the animals was subjected or not to a protein restriction (~40% reduction) challenge 
+
 *meanBW:* Average body weight (kg)
 
 *BWC1:* Body weight change during the experimental period
@@ -409,7 +411,7 @@ Let's create a final databse containing only the Animal Id and the FE metrics es
 
 ````{r}
 #Filtering the database created in this tutorial based on the column names
-FE.metrics<-FE.db[,c("Animal_ID","FEI","FCR", "RFI_pryce", "RFI2", "RFI3")]
+FE.metrics<-FE.db[,c("Animal_ID","Treatment","FEI","FCR", "RFI_pryce", "RFI2", "RFI3")]
 
 head(FE.metrics)
 
@@ -423,6 +425,123 @@ write.table(FE.metrics, file="Feed_EfficiencyMetrics_smarter.txt", col.names=T, 
 ````
 
 This will create the tab-delimited file "Feed_EfficiencyMetrics_smarter.txt" in your work directory.
+
+
+## Checking the effect of protein restriction over feed efficiency
+
+The animals which composed the database analyzed here were subject to a nutritional protein restriction (NPR). Initially, 40 lamb ewes from a single flock in the northwest region of Castilla y León (Spain) that were transported to the facilities of the IGM in León were fed a standard diet for replacement ewe lambs providing 16% crude protein until three months of age and were subsequently divided into two groups. The two experimental groups were composed of 20 NPR and 20 C animals. To evaluate the impact of feed restriction challenge due to a trade market problem and a shortage of concentrate inputs, the C ewes received the standard diet mentioned above for 64 d; during the same period, the NPR ewes received the same diet without soybean meal (44% reduction in protein intake). The 64-d NPR period in the prepuberal stage was coincident with the allometric growth of the mammary gland. Now, we will evaluate if the feed efficiency metrics estimated here are significantly different between control and challenge groups. 
+
+
+### **FEI**
+
+````{r}
+# Here we will compare the means of FEI between control and challenge groups using a t-test. But first, we need to define if there is variance equality between groups.
+
+var.test(FEI ~ Treatment, data=FE.metrics)
+
+#The result results of the variance equality test (p-value = 0.3758) suggest that the variances are equal between groups. Therefore, we are assuming this in the t-test. 
+
+t.test(FEI ~ Treatment, data=FE.metrics, var.equal = TRUE)
+
+````
+
+
+### **FCR**
+
+````{r}
+# Here we will compare the means of FCR between control and challenge groups using a t-test. But first, we need to define if there is variance equality between groups.
+
+var.test(FCR ~ Treatment, data=FE.metrics)
+
+#The result results of the variance equality test (p-value = 0.9814) suggest that the variances are equal between groups. Therefore, we are assuming this in the t-test. 
+
+t.test(FCR ~ Treatment, data=FE.metrics, var.equal = TRUE)
+
+````
+
+
+
+### **RFI pryce**
+
+````{r}
+# Here we will compare the means of RFI_pryce between control and challenge groups using a t-test. But first, we need to define if there is variance equality between groups.
+
+var.test(RFI_pryce ~ Treatment, data=FE.metrics)
+
+#The result results of the variance equality test (p-value = 0.7907) suggest that the variances are equal between groups. Therefore, we are assuming this in the t-test. 
+
+t.test(RFI_pryce ~ Treatment, data=FE.metrics, var.equal = TRUE)
+
+````
+
+
+### **RFI2**
+
+````{r}
+# Here we will compare the means of RFI2 between control and challenge groups using a t-test. But first, we need to define if there is variance equality between groups.
+
+var.test(RFI2 ~ Treatment, data=FE.metrics)
+
+#The result results of the variance equality test (p-value = 0.1377) suggest that the variances are equal between groups. Therefore, we are assuming this in the t-test. 
+
+t.test(RFI2 ~ Treatment, data=FE.metrics, var.equal = TRUE)
+
+````
+
+
+### **RFI3**
+
+````{r}
+# Here we will compare the means of RFI3 between control and challenge groups using a t-test. But first, we need to define if there is variance equality between groups.
+
+var.test(RFI3 ~ Treatment, data=FE.metrics)
+
+#The result results of the variance equality test (p-value = 0.765) suggest that the variances are equal between groups. Therefore, we are assuming this in the t-test. 
+
+t.test(RFI3 ~ Treatment, data=FE.metrics, var.equal = TRUE)
+
+````
+
+
+We can also check the distribution of each value within control and challenge groups using boxplots.
+
+````{r, fig.dim = c(10, 6)}
+#FEI
+FEI_NPR_plot<-ggplot(FE.metrics, aes(y=FEI,x=Treatment, fill=Treatment)) + 
+  geom_boxplot() + scale_x_discrete(name = "NPR Groups") +
+  theme_bw() + scale_fill_manual(values=c("chartreuse", "brown3")) + 
+  ggtitle("FEI")
+
+#FCR
+FCR_NPR_plot<-ggplot(FE.metrics, aes(y=FCR,x=Treatment, fill=Treatment)) + 
+  geom_boxplot() + scale_x_discrete(name = "NPR Groups") +
+  theme_bw() + scale_fill_manual(values=c("chartreuse", "brown3")) + 
+  ggtitle("FCR")
+
+#RFI_pryce
+RFI_pryce_NPR_plot<-ggplot(FE.metrics, aes(y=RFI_pryce,x=Treatment, fill=Treatment)) + 
+  geom_boxplot() + scale_x_discrete(name = "NPR Groups") +
+  theme_bw() + scale_fill_manual(values=c("chartreuse", "brown3")) + 
+  ggtitle("RFI_pryce")
+
+
+#RFI2
+RFI2_NPR_plot<-ggplot(FE.metrics, aes(y=RFI2,x=Treatment, fill=Treatment)) + 
+  geom_boxplot() + scale_x_discrete(name = "NPR Groups") +
+  theme_bw() + scale_fill_manual(values=c("chartreuse", "brown3")) + 
+  ggtitle("RFI2")
+
+#RFI3
+RFI3_NPR_plot<-ggplot(FE.metrics, aes(y=RFI3,x=Treatment, fill=Treatment)) + 
+  geom_boxplot() + scale_x_discrete(name = "NPR Groups") +
+  theme_bw() + scale_fill_manual(values=c("chartreuse", "brown3")) + 
+  ggtitle("RFI3")
+
+
+(FEI_NPR_plot | FCR_NPR_plot) / (RFI_pryce_NPR_plot | RFI2_NPR_plot | RFI3_NPR_plot)
+
+
+````
 
 ## Additional comment
 
