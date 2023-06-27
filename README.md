@@ -11,22 +11,22 @@
 
 ## General info
 
-This repository contains the material necessary for the anañysis of feed efficiency in Assaf ewes that will be presented at the SMARTER Training School: "Using Genetics and Modelling to Improve Resilience and Efficiency in Small Ruminants". 
+This repository contains the material necessary for the analysis of feed efficiency in Assaf ewes that will be presented at the SMARTER Training School: "Using Genetics and Modelling to Improve Resilience and Efficiency in Small Ruminants". 
 
 *Tutorial:* https://pablobio.github.io/FeedEfficiency_SMARTER2023/
 
-*Database:* Folder containing the databse required for FE estimations
+*Database:* Folder containing the database required for FE estimations
 
 
 ## Software and packages
 
-For this course you will need to have installed in your computer the latest versions of R and RStudio. This softwares can be downloaded in the following links:
+For this course, you will need to have installed in your computer the latest versions of R and RStudio. This software can be downloaded through the following links:
 
 - **R:** https://cran.irsn.fr/
 
 - **Rstudio:** https://rstudio.com/products/rstudio/download/
 
-In addition to R and RStudio, you will also need to install some packages that will be required for the analysis. The list of packages used in this course can be find below. 
+In addition to R and RStudio, you will also need to install some packages that will be required for the analysis. The list of packages used in this course can be found below. 
 
 ```{r global_options, include = FALSE}
 install.packages("ggplot2")
